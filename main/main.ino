@@ -9,38 +9,80 @@ u8g2_uint_t offset;     // current offset for the scrolling text
 u8g2_uint_t width;      // pixel width of the scrolling text (must be lesser than 128 unless U8G2_16BIT is defined
 const char *text = " "; // scroll this text from right to left
 
+#include <Adafruit_AS7341.h>
+
+Adafruit_AS7341 as7341;
 
 void setup(void) {
   u8g2.begin();
 
-  u8g2.setFont(u8g2_font_logisoso32_tf); // set the target font to calculate the pixel width
-  width = u8g2.getUTF8Width(text);    // calculate the pixel width of the text
-
+  u8g2.setFont(u8g2_font_cursor_tf);
+  u8g2.setCursor(8,15);
+  u8g2.print("^");
+  u8g2.sendBuffer();
   u8g2.setFontMode(0);    // enable transparent mode, which is faster
+
+  Serial.begin(115200);
+
+  // Wait for communication with the host computer serial monitor
+  while (!Serial) {
+    delay(1);
+  }
+  
+  if (!as7341.begin()){
+    Serial.println("Could not find AS7341");
+    while (1) { delay(10); }
+  }
+
+  as7341.setATIME(100);
+  as7341.setASTEP(999);
+  as7341.setGain(AS7341_GAIN_256X);
 }
 
 
 void loop(void) {
-  u8g2_uint_t x;
 
-  u8g2.firstPage();
-  do {
+  if (!as7341.readAllChannels()){
+    Serial.println("Error reading all channels!");
+    return;
+  }
 
-    // draw the scrolling text at current offset
-    x = offset;
-    u8g2.setFont(u8g2_font_logisoso32_tf);   // set the target font
-    do {                // repeated drawing of the scrolling text...
-      u8g2.drawUTF8(x, 32, text);     // draw the scolling text
-      x += width;           // add the pixel width of the scrolling text
-    } while ( x < u8g2.getDisplayWidth() );   // draw again until the complete display is filled
+  // Print out the stored values for each channel
+  Serial.print("F1 415nm : ");
+  Serial.println(as7341.getChannel(AS7341_CHANNEL_415nm_F1));
+  Serial.print("F2 445nm : ");
+  Serial.println(as7341.getChannel(AS7341_CHANNEL_445nm_F2));
+  Serial.print("F3 480nm : ");
+  Serial.println(as7341.getChannel(AS7341_CHANNEL_480nm_F3));
+  Serial.print("F4 515nm : ");
+  Serial.println(as7341.getChannel(AS7341_CHANNEL_515nm_F4));
+  Serial.print("F5 555nm : ");
+  Serial.println(as7341.getChannel(AS7341_CHANNEL_555nm_F5));
+  Serial.print("F6 590nm : ");
+  Serial.println(as7341.getChannel(AS7341_CHANNEL_590nm_F6));
+  Serial.print("F7 630nm : ");
+  Serial.println(as7341.getChannel(AS7341_CHANNEL_630nm_F7));
+  Serial.print("F8 680nm : ");
+  Serial.println(as7341.getChannel(AS7341_CHANNEL_680nm_F8));
 
-    u8g2.setFont(u8g2_font_logisoso32_tf);   // draw the current pixel width
-    u8g2.setCursor(0, 64);
-    u8g2.print(width);          // this value must be lesser than 128 unless U8G2_16BIT is set
+  Serial.print("Clear    : ");
+  Serial.println(as7341.getChannel(AS7341_CHANNEL_CLEAR));
 
-  } while ( u8g2.nextPage() );
+  Serial.print("Near IR  : ");
+  Serial.println(as7341.getChannel(AS7341_CHANNEL_NIR));
 
-  offset -= 1;            // scroll by one pixel
-  if ( (u8g2_uint_t)offset < (u8g2_uint_t) - width )
-    offset = 0;             // start over again
+  Serial.println("");
+
+  u8g2.setFont(u8g2_font_victoriamedium8_8u);
+  u8g2.setCursor(24,12);
+  u8g2.print("BPM:  ");
+  u8g2.print(100);
+  u8g2.setCursor(24,24);
+  u8g2.print("SPO2:  ");
+  u8g2.print(100);
+
+  u8g2.setCursor(0,32);
+  u8g2.setFont(u8g2_font_profont10_mr);
+  u8g2.print("OK        ");
+  u8g2.sendBuffer();
 }
