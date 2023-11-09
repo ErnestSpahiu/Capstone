@@ -13,10 +13,7 @@ const char *text = " "; // scroll this text from right to left
 
 #include <Wire.h>
 
-#define AS7343_ADDR 0x39
-
 #define ID 0xE0 // AS7343 ID (10000001)
-
 Adafruit_AS7341 as7341;
 
 void setup(void) {
