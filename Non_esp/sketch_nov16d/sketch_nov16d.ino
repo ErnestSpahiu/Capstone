@@ -4,6 +4,29 @@
 
 int loopC = 0;
 
+uint16_t readChannel(byte address)
+{
+  uint8_t readingL; uint16_t readingH; uint16_t reading = 0;
+  Wire.beginTransmission(COLOR16_DEVICE_ADDRESS);
+  Wire.write(address);
+  Wire.endTransmission();
+
+  Wire.requestFrom(COLOR16_DEVICE_ADDRESS, 2);
+
+  if (2 <= Wire.available())
+  {
+    readingL = Wire.read();
+    readingH = Wire.read();
+    readingH = readingH << 8;
+    reading = (readingH | readingL);
+    return (reading);
+  }
+  else
+  {
+    return (0xFFFF); //Error
+  }
+}
+
 byte readRegister(byte address)
 {
   Wire.beginTransmission(COLOR16_DEVICE_ADDRESS);
@@ -144,7 +167,7 @@ void loop() {
   byte astatusValue = readRegister(COLOR16_REG_ASTATUS);
 
   byte firstDataReg = 0x95;
-  byte lastDataReg = 0xB8;
+  byte lastDataReg = 0xB7;
   const int totalChannels = (lastDataReg - firstDataReg) / 2 + 1;
 
   // Buffer to store spectral data
@@ -152,29 +175,15 @@ void loop() {
 
   for (int channel = 0; channel < totalChannels; channel++) {
       int regAddress = firstDataReg + 2 * channel;
+      spectralData[channel] = readChannel(regAddress);
 
-      // Start reading from the specific register for the channel
-      Wire.beginTransmission(COLOR16_DEVICE_ADDRESS);
-      Wire.write(regAddress);
-      Wire.endTransmission();
-      Wire.requestFrom(COLOR16_DEVICE_ADDRESS, 2); // 16-bit values = 2 bytes
-
-      if (Wire.available() >= 2) {
-          byte lowByte = Wire.read();
-          byte highByte = Wire.read();
-          spectralData[channel] = (highByte << 8) | lowByte;
-
-          // Print the channel number and its data
-          Serial.print("Channel ");
-          Serial.print(channel + 1);
-          Serial.print(": ");
-          Serial.println(spectralData[channel]);
-      } else {
-          Serial.print("Failed to read spectral data for channel ");
-          Serial.println(channel + 1);
-          break;
-      }
+      // Print the channel number and its data
+      Serial.print("Channel ");
+      Serial.print(channel + 1);
+      Serial.print(": ");
+      Serial.println(spectralData[channel]);
   }
+
   // CH7-CH19 are 0
   // Delay before repeating (adjust as needed)
 
