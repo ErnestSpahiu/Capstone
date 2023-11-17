@@ -74,10 +74,6 @@ void setup() {
   writeRegister(COLOR16_REG_ENABLE, 0x01);
   readRegister(COLOR16_REG_ENABLE);
 
-  Serial.println("SETUP END:");
-}
-
-void loop() {
   // read REG_BANK ->  0x58 to 0x66 needs 1 else 0
   byte value = readRegister(COLOR16_CFG_0_REG_BANK);
   Serial.print("**REG_BANK**: ");
@@ -85,15 +81,22 @@ void loop() {
     byte bitValue = (value >> bit) & 0x01;
     Serial.print(bitValue, BIN);
   }
-  Serial.println(); // Print a newline after all bits
 
+  // Start measurements - set bit 1 SP_EN of ENABLE REG to enable readings
+  writeRegister(COLOR16_REG_ENABLE, 0x03);
+  readRegister(COLOR16_REG_ENABLE);
+
+  Serial.println("SETUP END:");
+}
+
+void loop() {
+
+  Serial.println(); // Print a newline after all bits
   Serial.print("loop: ");
   Serial.println(++loopC);
 
-  // Read all channels at the same time and store in as7341 object
-
   // read ENABLE REG
-  value = readRegister(COLOR16_REG_ENABLE);
+  int value = readRegister(COLOR16_REG_ENABLE);
   Serial.print("COLOR16_REG_ENABLE: ");
   for (int bit = 7; bit >= 0; bit--) {
     byte bitValue = (value >> bit) & 0x01;
@@ -136,10 +139,6 @@ void loop() {
     Serial.print(bitValue, BIN);
   }
   Serial.println(); // Print a newline after all bits
-
-  // READING CHANNELS - set bit 1 SP_EN of ENABLE REG to enable readings
-  writeRegister(COLOR16_REG_ENABLE, 0x03);
-  readRegister(COLOR16_REG_ENABLE);
 
   // Read ASTATUS to latch spectral channels
   byte astatusValue = readRegister(COLOR16_REG_ASTATUS);
