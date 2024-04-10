@@ -1,0 +1,432 @@
+<!-- Ernest Spahiu April 08/2024 -->
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>SpectraStream</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="main.css" />
+	</head>
+	<body class="left-sidebar is-preload">
+		<div id="page-wrapper">
+
+			<!-- Header -->
+				<section id="header" class="wrapper">
+
+					<!-- Logo -->
+						<div id="logo">
+							<h1><img src="teamlogoT.png" width="3%" height="3%"/><a href="index.html">SpectraStream</a></h1>
+							<p>Group 27</p>
+						</div>
+
+					<!-- Nav -->
+						<nav id="nav">
+							<ul>
+								<li><a href="index.html">Home</a></li>
+								<li>
+									<a href="#">Operation</a>
+									<ul>
+										<li><a href="#continous chart">Continuous Mode</a></li>
+										<li><a href="#discrete">Discrete Mode</a></li>
+									</ul>
+								</li>
+								<li><a href="right-sidebar.html">Hardware</a></li>
+							</ul>
+						</nav>
+
+				</section>
+
+			<!-- Main -->
+				<section id="main" class="wrapper style2">
+					<div class="title">Continuous Mode</div>
+					<div class="container">
+						<div class="row gtr-150">
+								<!-- Content -->
+									<div id="content">
+										<article class="content1">
+											<div id="continous chart" class="container"></div>
+											<header1 id="button-controls">
+												<h6 onclick="getSpectrum()" class="button-gradient">Get Spectrum</h6>
+												<h6 onclick="clearContChart()" class="button-clear">Clear Spectrum</h6>
+											</header1>
+											<p>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget.
+											odio eleifend. Duis commodo fringilla commodo. Aliquam erat volutpat. Vestibulum
+											facilisis leo magna. Cras sit amet urna eros, id egestas urna. Quisque aliquam
+											tempus euismod. Vestibulum ante ipsum primis in faucibus.</p>
+										</article>
+										<div class="row gtr-150">
+											<div class="col-6 col-12-small">
+												<section class="box">
+													<header>
+														<h2>Magna pulvinar tempus</h2>
+													</header>
+													<a href="#" class="image featured"><img src="images/pic05.jpg" alt="" /></a>
+													<p>Rutrum bibendum. Proin pellentesque diam non ligula commodo tempor. Vivamus
+													eget urna nibh. Curabitur non fringilla nisl. Donec accumsan interdum nisi, quis
+													tempus.</p>
+													<a href="#" class="button style1">More</a>
+												</section>
+											</div>
+											<div class="col-6 col-12-small">
+												<section class="box">
+													<header>
+														<h2>Magna pulvinar tempus</h2>
+													</header>
+													<a href="#" class="image featured"><img src="images/pic06.jpg" alt="" /></a>
+													<p>Rutrum bibendum. Proin pellentesque diam non ligula commodo tempor. Vivamus
+													eget urna nibh. Curabitur non fringilla nisl. Donec accumsan interdum nisi, quis
+													tempus.</p>
+													<a href="#" class="button style1">More</a>
+												</section>
+											</div>
+										</div>
+									</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+			<!-- discrete -->
+				<section id="discrete" class="wrapper style3">
+					<div class="title">Discrete Mode</div>
+					<div id="container"></div>
+					<p class="highcharts-description">
+					  This dashboard shows the raw ADC Count of each Channel.<br/>
+					</p>
+				</section>
+		</div>
+
+		<!-- Scripts -->
+			<script src="https://code.highcharts.com/highcharts.js"></script>
+			<script src="https://code.highcharts.com/highcharts.js"></script>
+			<script src="https://code.highcharts.com/dashboards/datagrid.js"></script>
+			<script src="https://code.highcharts.com/dashboards/dashboards.js"></script>
+			<script src="https://code.highcharts.com/dashboards/modules/layout.js"></script>
+			<script src="https://code.highcharts.com/modules/exporting.js"></script>
+			<script src="https://code.highcharts.com/modules/export-data.js"></script>
+			<script>
+				let spectrumIntervalId = null;
+
+				var chartT = new Highcharts.Chart({
+				  chart:{ renderTo : 'continous chart', type: 'spline'},
+				  title: { text: 'Continuous Mode' },
+				  series: [{
+					  name: 'Blue (F4)',
+					  color: '#3260a8',
+					  data: [0]
+					},
+					{
+					  name: 'Red (F7)',
+					  color: '#a83232',
+					  data: [0]
+					},
+					{
+					  name: 'Green (FY)',
+					  color: '#32a838',
+					  data: [0]
+				  },
+				  {
+					  name: 'Orange (FXL)',
+					  color: '#f59042',
+					  data: [0]
+				  },
+				  {
+					  name: 'Violet (F1)',
+					  color: '#f542f2',
+					  data: [0]
+				  },
+				  {
+					  name: 'Lime (F5)',
+					  color: '#98fc03',
+					  data: [0]
+				  },
+				  {
+					  name: 'Dark Red (F8)',
+					  color: '#ad0000',
+					  data: [0]
+				  },
+				  {
+					  name: 'Brown (F6)',
+					  color: '#ad5c00',
+					  data: [0]
+				  },
+				  {
+					  name: 'Cyan (F3)',
+					  color: '#07f7ef',
+					  data: [0]}
+
+				],
+				  plotOptions: {
+					line: {
+					  animation: false,
+					  dataLabels: {
+					  enabled: true
+					  }
+					},
+				  },
+				  legend: {
+						layout: 'vertical',
+						align: 'right',
+						verticalAlign: 'middle'
+				  },
+				  yAxis: {
+					title: { text: 'Intensity (ADC Count)' }
+				  },
+				  credits: { enabled: false },
+				  responsive: {
+						rules: [{
+							condition: {
+								maxWidth: 5
+							},
+							chartOptions: {
+								legend: {
+									layout: 'horizontal',
+									align: 'center',
+									verticalAlign: 'bottom'
+								}
+							}
+						}]
+					}
+				});
+				function getSpectrum() {
+					// Resume chart
+					if (spectrumIntervalId !== null) return; // Prevent multiple intervals if already running
+					spectrumIntervalId = setInterval(function() {
+						var xhttp = new XMLHttpRequest();
+						xhttp.onreadystatechange = function() {
+							if (this.readyState == 4 && this.status == 200) {
+								var values = this.responseText.split(",");
+								console.log(values);
+								console.log("Raw response:", this.responseText);
+
+								// Update chart series names and add new points in a loop
+								for (let i = 0; i < chartT.series.length; i++) {
+									// Assuming each series has two entries: name and value
+									const nameIndex = i * 2;
+									const valueIndex = nameIndex + 1;
+
+									const channelName = values[nameIndex].trim();
+									const channelValue = parseFloat(values[valueIndex].trim());
+
+									chartT.series[i].update({ name: channelName }, false);
+									
+									// Decide whether to shift based on series 0's length
+									const shift = chartT.series[0].data.length >= 20;
+									chartT.series[i].addPoint(channelValue, true, shift);
+								}
+							}
+						};
+						xhttp.open("GET", "/bluechannel", true);
+						xhttp.send();
+					}, 500); // Consider increasing this interval for performance
+				}
+				function clearContChart() {
+					// Pause chart and clear data
+					chartT.series.forEach(series => series.setData([]));
+					if (spectrumIntervalId !== null) {
+						clearInterval(spectrumIntervalId);
+						spectrumIntervalId = null; // Reset the variable so it can be started again
+					}
+				}
+
+				//code for discrete mode starts
+				let dataArr = [
+					['Blue (F4)', 0, 520],
+					['Red (F7)', 10, 680],
+					['Green (FY)', 20, 570],
+					['Orange (FXL)', 30, 600],
+					['Violet (F1)', 40, 400],
+					['Lime (F5)', 30, 540],
+					['Dark Red (F8)', 20, 740],
+					['Brown (F6)', 10, 630],
+					['Cyan (F3)', 0, 470]
+				];
+				var previousMode = null;
+
+				function fetchDataArrValues() {
+					var xhttp = new XMLHttpRequest();
+					xhttp.onreadystatechange = function() {
+						if (this.readyState === 4 && this.status === 200) {
+							// Split the response text into an array of values
+							let values = this.responseText.split(",");
+							
+							// Update only the numeric values in dataArr
+							for (let i = 0; i < dataArr.length; i++) {
+								let valueIndex = i * 2 + 1; // Calculate index based on response structure
+								if (values[valueIndex]) { // Check if the value exists to avoid errors
+									let channelValue = parseFloat(values[valueIndex].trim());
+									dataArr[i][1] = channelValue; // Update only the value, keep name and wavelength unchanged
+								}
+							}
+							
+							console.log('Updated values in dataArr:', dataArr);
+							// Optionally, trigger any updates needed to refresh visualizations using dataArr
+						}
+					};
+					xhttp.open("GET", "/bluechannel", true);
+					xhttp.send();
+				}
+
+				function fetchModeAndUpdateDataArrValues() {
+					// Fetch the current mode first
+					var modeXhttp = new XMLHttpRequest();
+					modeXhttp.onreadystatechange = function() {
+						if (this.readyState === 4 && this.status === 200) {
+							var currentMode = this.responseText.trim();
+							
+							// Check if the mode has changed since last fetch
+							if (currentMode !== previousMode) {
+								console.log('Get Discrete Measurement', currentMode);
+								// Update previousMode to the currentMode
+								previousMode = currentMode;
+								// Fetch and update dataArr values since the mode has changed
+								console.log('Result:', currentMode);
+								fetchDataArrValues();
+							}
+						}
+					};
+					modeXhttp.open("GET", "/measurementReq", true);
+					modeXhttp.send();
+				}
+
+				// Initially call the function to fetch mode and update dataArr if needed
+				fetchModeAndUpdateDataArrValues();
+				// Then, set an interval to periodically check the mode and update dataArr if the mode has changed
+				setInterval(fetchModeAndUpdateDataArrValues, 100); 
+
+				var chartS = Dashboards.board('container', {
+					dataPool: {
+						connectors: [{
+							id: 'micro-element',
+							type: 'JSON',
+							options: {
+								firstRowAsNames: false,
+								columnNames: ['Channel:', 'Intensity',  'wavelength'],
+								enablePolling: true,
+								dataRefreshRate: 1.1, //currently set to 2.5 seconds, should be appr to update of dataArr
+								data: dataArr
+							}
+						}]
+					},
+					gui: {
+						layouts: [{
+							rows: [{
+								cells: [{
+									id: 'kpi-wrapper',
+									layout: {
+										rows: [{
+											cells: [{
+												id: 'kpi-creatinine'
+											}]
+										}]
+									}
+								}, {
+									id: 'dashboard-col-0'
+								}, {
+									id: 'dashboard-col-1'
+								}]
+							}, {
+								cells: [{
+									id: 'dashboard-col-2'
+								}]
+							}]
+						}]
+					},
+					components: [{
+						type: 'KPI',
+						renderTo: 'kpi-creatinine',
+						value: 900,
+						valueFormat: '{value}',
+						title: 'Creatinine',
+						subtitle: 'Baseline'
+					}, {
+						sync: {
+							visibility: true,
+							highlight: true,
+							extremes: true
+						},
+						connector: {
+							id: 'micro-element',
+							columnAssignment: [{
+								seriesId: 'Intensity',
+								data: ['Channel:', 'Intensity']
+							}]
+						},
+						renderTo: 'dashboard-col-0',
+						type: 'Highcharts',
+						chartOptions: {
+							chart: {
+								styledMode: false,
+							},
+							xAxis: {
+								type: 'category',
+							},
+							yAxis: {
+								title: {
+									text: 'Intensity'
+								},
+								plotLines: [{
+									value: 900,
+									zIndex: 7,
+									dashStyle: 'shortDash',
+									label: {
+										text: 'Peak',
+										align: 'right',
+										style: {
+											color: '#B73C28'
+										}
+									}
+								}]
+							},
+							credits: {
+								enabled: false
+							},
+							plotOptions: {
+								series: {
+									marker: {
+										radius: 10
+									},
+								},
+								column: {
+									colorByPoint: true
+								}
+							},
+							legend: {
+								enabled: true,
+								verticalAlign: 'top'
+							},
+							chart: {
+								animation: false,
+								type: 'column',
+								spacing: [30, 30, 30, 20]
+							},
+							title: {
+								text: ''
+							},
+							tooltip: {
+								valueSuffix: ' Intensity',
+								stickOnContact: true
+							},
+						}
+					}, {
+						renderTo: 'dashboard-col-2',
+						connector: {
+							id: 'micro-element'
+						},
+						type: 'DataGrid',
+						sync: {
+							highlight: true,
+							visibility: true
+						}
+					}]
+				}, true);
+			</script>
+			<script src="jquery.min.js"></script>
+			<script src="jquery.dropotron.min.js"></script>
+			<script src="browser.min.js"></script>
+			<script src="breakpoints.min.js"></script>
+			<script src="util.js"></script>
+			<script src="main.js"></script>
+
+	</body>
+</html>
